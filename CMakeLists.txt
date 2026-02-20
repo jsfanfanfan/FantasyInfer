@@ -14,7 +14,7 @@ if (!WIN32)
     set(link_lib "${link_lib} pthread")
 endif ()
 set(link_math_lib ${ARMADILLO_LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
-aux_source_directory(./test DIR_TEST_ARMA)
+aux_source_directory(./test/test_topo DIR_TEST_ARMA)
 aux_source_directory(./source DIR_SOURCE_ARMA)
 
 add_executable(FantasyInfer main.cpp ${DIR_TEST_ARMA} ${DIR_SOURCE_ARMA})

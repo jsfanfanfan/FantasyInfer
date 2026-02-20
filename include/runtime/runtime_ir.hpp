@@ -125,6 +125,7 @@ namespace fantasy_infer
         std::string bin_path_;    /// 计算图的权重文件
 
         std::vector<std::shared_ptr<RuntimeOperator>> operators_;
+        // 需要记录后继节点
         std::map<std::string, std::shared_ptr<RuntimeOperator>> operators_maps_;
         std::vector<std::shared_ptr<RuntimeOperator>> topo_operators_;
 

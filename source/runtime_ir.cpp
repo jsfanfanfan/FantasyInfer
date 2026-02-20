@@ -222,7 +222,7 @@ void RuntimeGraph::Build(const std::string &input_name,
 
   // 构建图关系
   for (const auto &current_op : this->operators_) {
-    // 获取当前节点的所有后继节点的names，遍历根据next_op_name从operators_maps_中插入所需要的节点
+    // 获取当前节点的所有后继节点的 names，遍历根据  next_op_name从 operators_maps_ 中插入所需要的节点
     const std::vector<std::string> &output_names = current_op->output_names;
     for (const auto &kOutputName : output_names) {
       if (const auto &output_op = this->operators_maps_.find(kOutputName);
