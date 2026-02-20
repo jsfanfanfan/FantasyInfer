@@ -56,7 +56,7 @@ namespace fantasy_infer
 
     private:
         /**
-         * 初始化kuiper infer计算图节点中的输入操作数
+         * 初始化fantasy infer计算图节点中的输入操作数
          * @param inputs pnnx中的输入操作数
          * @param runtime_operator 计算图节点
          */
@@ -65,7 +65,7 @@ namespace fantasy_infer
             const std::shared_ptr<RuntimeOperator> &runtime_operator);
 
         /**
-         * 初始化kuiper infer计算图节点中的输出操作数
+         * 初始化fantasy infer计算图节点中的输出操作数
          * @param outputs pnnx中的输出操作数
          * @param runtime_operator 计算图节点
          */
@@ -74,7 +74,7 @@ namespace fantasy_infer
             const std::shared_ptr<RuntimeOperator> &runtime_operator);
 
         /**
-         * 初始化kuiper infer计算图中的节点属性
+         * 初始化fantasy infer计算图中的节点属性
          * @param attrs pnnx中的节点属性
          * @param runtime_operator 计算图节点
          */
@@ -83,7 +83,7 @@ namespace fantasy_infer
                        const std::shared_ptr<RuntimeOperator> &runtime_operator);
 
         /**
-         * 初始化kuiper infer计算图中的节点参数
+         * 初始化fantasy infer计算图中的节点参数
          * @param params pnnx中的参数属性
          * @param runtime_operator 计算图节点
          */
