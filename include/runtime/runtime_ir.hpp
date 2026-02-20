@@ -54,6 +54,16 @@ namespace fantasy_infer
 
         const std::vector<std::shared_ptr<RuntimeOperator>> &operators() const;
 
+        /**
+        * 构建计算图
+        * @param input_name 计算图输入节点的名称
+        * @param output_name  计算图输出节点的名称
+        */
+        void Build(const std::string &input_name, const std::string &output_name);
+
+        const std::vector<std::shared_ptr<RuntimeOperator>> &get_topo_queues() const;
+
+
     private:
         /**
          * 初始化fantasy infer计算图节点中的输入操作数
@@ -91,8 +101,24 @@ namespace fantasy_infer
         InitGraphParams(const std::map<std::string, pnnx::Parameter> &params,
                         const std::shared_ptr<RuntimeOperator> &runtime_operator);
 
-    public:
+        void ReverseTopo(const std::shared_ptr<RuntimeOperator> &root_op);
+    
     private:
+        enum class GraphState {
+            NeedInit = -2,
+            NeedBuild = -1,
+            Complete = 0,
+        };
+
+    public:
+    /**
+        * 返回模型当前的状态
+        * @return 返回模型当前的状态
+        */
+        GraphState graph_state() const;
+        
+    private:
+        GraphState graph_state_ = GraphState::NeedInit;
         std::string input_name_;  /// 计算图输入节点的名称
         std::string output_name_; /// 计算图输出节点的名称
         std::string param_path_;  /// 计算图的结构文件
@@ -100,6 +126,7 @@ namespace fantasy_infer
 
         std::vector<std::shared_ptr<RuntimeOperator>> operators_;
         std::map<std::string, std::shared_ptr<RuntimeOperator>> operators_maps_;
+        std::vector<std::shared_ptr<RuntimeOperator>> topo_operators_;
 
         std::unique_ptr<pnnx::Graph> graph_; /// pnnx的graph
     };
