@@ -14,7 +14,7 @@ namespace fantasy_infer
     {
         std::string name;                                     /// 操作数的名称
         std::vector<int32_t> shapes;                          /// 操作数的形状
-        std::vector<std::shared_ptr<Tensor<float>>> datas;    /// 存储操作数
+        std::vector<std::shared_ptr<Tensor<float>>> datas;    /// 存储操作数的空间
         RuntimeDataType type = RuntimeDataType::kTypeUnknown; /// 操作数的类型，一般是float
     };
 }
