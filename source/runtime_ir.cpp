@@ -1,5 +1,6 @@
 #include "runtime/runtime_ir.hpp"
 #include "status_code.hpp"
+#include "layer/abstract/layer_factory.hpp"
 #include <deque>
 #include <iostream>
 #include <memory>
@@ -38,17 +39,17 @@ void RuntimeGraph::InitGraphOperatorsInput(
     runtime_operand->shapes = input->shape;
 
     switch (input->type) {
-    case 1: {
-      runtime_operand->type = RuntimeDataType::kTypeFloat32;
-      break;
-    }
-    case 0: {
-      runtime_operand->type = RuntimeDataType::kTypeUnknown;
-      break;
-    }
-    default: {
-      LOG(FATAL) << "Unknown input operand type: " << input->type;
-    }
+      case 1: {
+        runtime_operand->type = RuntimeDataType::kTypeFloat32;
+        break;
+      }
+      case 0: {
+        runtime_operand->type = RuntimeDataType::kTypeUnknown;
+        break;
+      }
+      default: {
+        LOG(FATAL) << "Unknown input operand type: " << input->type;
+      }
     }
     runtime_operator->input_operands.insert({producer->name, runtime_operand});
     runtime_operator->input_operands_seq.push_back(runtime_operand);
@@ -70,70 +71,68 @@ void RuntimeGraph::InitGraphOperatorsOutput(
 }
 
 void RuntimeGraph::InitGraphParams(
-    const std::map<std::string, pnnx::Parameter> &params,
-    const std::shared_ptr<RuntimeOperator> &runtime_operator) {
-  for (const auto &[name, parameter] : params) {
+    const std::map<std::string, pnnx::Parameter>& params,
+    const std::shared_ptr<RuntimeOperator>& runtime_operator) {
+  for (const auto& [name, parameter] : params) {
     const int type = parameter.type;
     switch (type) {
-    case int(RuntimeParameterType::kParameterUnknown): {
-      RuntimeParameter *runtime_parameter = new RuntimeParameter;
-      runtime_operator->params.insert({name, runtime_parameter});
-      break;
-    }
+      case int(RuntimeParameterType::kParameterUnknown): {
+        std::shared_ptr<RuntimeParameter> runtime_parameter =
+            std::make_shared<RuntimeParameter>();
+        runtime_operator->params.insert({name, runtime_parameter});
+        break;
+      }
 
-    case int(RuntimeParameterType::kParameterBool): {
-      RuntimeParameterBool *runtime_parameter = new RuntimeParameterBool;
-      runtime_parameter->value = parameter.b;
-      runtime_operator->params.insert({name, runtime_parameter});
-      break;
-    }
+      case int(RuntimeParameterType::kParameterBool): {
+        std::shared_ptr<RuntimeParameterBool> runtime_parameter =
+            std::make_shared<RuntimeParameterBool>(parameter.b);
+        runtime_operator->params.insert({name, runtime_parameter});
+        break;
+      }
 
-    case int(RuntimeParameterType::kParameterInt): {
-      RuntimeParameterInt *runtime_parameter = new RuntimeParameterInt;
-      runtime_parameter->value = parameter.i;
-      runtime_operator->params.insert({name, runtime_parameter});
-      break;
-    }
+      case int(RuntimeParameterType::kParameterInt): {
+        std::shared_ptr<RuntimeParameterInt> runtime_parameter =
+            std::make_shared<RuntimeParameterInt>(parameter.i);
+        runtime_operator->params.insert({name, runtime_parameter});
+        break;
+      }
 
-    case int(RuntimeParameterType::kParameterFloat): {
-      RuntimeParameterFloat *runtime_parameter = new RuntimeParameterFloat;
-      runtime_parameter->value = parameter.f;
-      runtime_operator->params.insert({name, runtime_parameter});
-      break;
-    }
+      case int(RuntimeParameterType::kParameterFloat): {
+        std::shared_ptr<RuntimeParameterFloat> runtime_parameter =
+            std::make_shared<RuntimeParameterFloat>(parameter.f);
+        runtime_operator->params.insert({name, runtime_parameter});
+        break;
+      }
 
-    case int(RuntimeParameterType::kParameterString): {
-      RuntimeParameterString *runtime_parameter = new RuntimeParameterString;
-      runtime_parameter->value = parameter.s;
-      runtime_operator->params.insert({name, runtime_parameter});
-      break;
-    }
+      case int(RuntimeParameterType::kParameterString): {
+        std::shared_ptr<RuntimeParameterString> runtime_parameter =
+            std::make_shared<RuntimeParameterString>(parameter.s);
+        runtime_operator->params.insert({name, runtime_parameter});
+        break;
+      }
 
-    case int(RuntimeParameterType::kParameterIntArray): {
-      RuntimeParameterIntArray *runtime_parameter =
-          new RuntimeParameterIntArray;
-      runtime_parameter->value = parameter.ai;
-      runtime_operator->params.insert({name, runtime_parameter});
-      break;
-    }
+      case int(RuntimeParameterType::kParameterIntArray): {
+        std::shared_ptr<RuntimeParameterIntArray> runtime_parameter =
+            std::make_shared<RuntimeParameterIntArray>(parameter.ai);
+        runtime_operator->params.insert({name, runtime_parameter});
+        break;
+      }
 
-    case int(RuntimeParameterType::kParameterFloatArray): {
-      RuntimeParameterFloatArray *runtime_parameter =
-          new RuntimeParameterFloatArray;
-      runtime_parameter->value = parameter.af;
-      runtime_operator->params.insert({name, runtime_parameter});
-      break;
-    }
-    case int(RuntimeParameterType::kParameterStringArray): {
-      RuntimeParameterStringArray *runtime_parameter =
-          new RuntimeParameterStringArray;
-      runtime_parameter->value = parameter.as;
-      runtime_operator->params.insert({name, runtime_parameter});
-      break;
-    }
-    default: {
-      LOG(FATAL) << "Unknown parameter type: " << type;
-    }
+      case int(RuntimeParameterType::kParameterFloatArray): {
+        std::shared_ptr<RuntimeParameterFloatArray> runtime_parameter =
+            std::make_shared<RuntimeParameterFloatArray>(parameter.af);
+        runtime_operator->params.insert({name, runtime_parameter});
+        break;
+      }
+      case int(RuntimeParameterType::kParameterStringArray): {
+        std::shared_ptr<RuntimeParameterStringArray> runtime_parameter =
+            std::make_shared<RuntimeParameterStringArray>(parameter.as);
+        runtime_operator->params.insert({name, runtime_parameter});
+        break;
+      }
+      default: {
+        LOG(FATAL) << "Unknown parameter type: " << type;
+      }
     }
   }
 }
@@ -203,6 +202,14 @@ bool RuntimeGraph::Init() {
   return true;
 }
 
+std::shared_ptr<Layer> RuntimeGraph::CreateLayer(
+    const std::shared_ptr<RuntimeOperator>& op) {
+  LOG_IF(FATAL, !op) << "Operator is empty!";
+  auto layer = LayerRegisterer::CreateLayer(op);
+  LOG_IF(FATAL, !layer) << "Layer init failed " << op->type;
+  return layer;
+}
+
 void RuntimeGraph::Build(const std::string &input_name,
                          const std::string &output_name) {
   if (graph_state_ == GraphState::Complete) {
@@ -216,18 +223,31 @@ void RuntimeGraph::Build(const std::string &input_name,
   }
 
   CHECK(graph_state_ >= GraphState::NeedBuild)
-      << "Graph status error, current state is " << int(graph_state_);
+          << "Graph status error, current state is " << int(graph_state_);
   LOG_IF(FATAL, this->operators_.empty())
-      << "Graph operators is empty, may be no init";
+          << "Graph operators is empty, may be no init";
 
   // 构建图关系
   for (const auto &current_op : this->operators_) {
-    // 获取当前节点的所有后继节点的 names，遍历根据  next_op_name从 operators_maps_ 中插入所需要的节点
+    // 获取当前节点的所有后继节点的names，遍历根据next_op_name从operators_maps_中插入所需要的节点
     const std::vector<std::string> &output_names = current_op->output_names;
     for (const auto &kOutputName : output_names) {
       if (const auto &output_op = this->operators_maps_.find(kOutputName);
           output_op != this->operators_maps_.end()) {
         current_op->output_operators.insert({kOutputName, output_op->second});
+      }
+    }
+  }
+
+  for (const auto &kOperator : this->operators_) {
+    // 除了输入和输出节点，都创建layer
+    if (kOperator->type != "pnnx.Input" && kOperator->type != "pnnx.Output") {
+      std::shared_ptr<Layer> layer = RuntimeGraph::CreateLayer(kOperator);
+      CHECK(layer != nullptr)
+              << "Layer " << kOperator->name << " create failed!";
+      if (layer) {
+        kOperator->layer = layer;
+        layer->set_runtime_operator(kOperator);
       }
     }
   }
@@ -246,7 +266,7 @@ void RuntimeGraph::Build(const std::string &input_name,
   }
 
   CHECK(topo_operators_.size() == operators_.size())
-      << "Build wrong topo queue";
+          << "Build wrong topo queue";
   std::reverse(topo_operators_.begin(), topo_operators_.end());
 
   graph_state_ = GraphState::Complete;
@@ -281,18 +301,18 @@ void RuntimeGraph::InitGraphAttrs(
     const std::shared_ptr<RuntimeOperator> &runtime_operator) {
   for (const auto &[name, attr] : attrs) {
     switch (attr.type) {
-    case 1: {
-      std::shared_ptr<RuntimeAttribute> runtime_attribute =
-          std::make_shared<RuntimeAttribute>();
-      runtime_attribute->type = RuntimeDataType::kTypeFloat32;
-      runtime_attribute->weight_data = attr.data;
-      runtime_attribute->shape = attr.shape;
-      runtime_operator->attribute.insert({name, runtime_attribute});
-      break;
-    }
-    default: {
-      LOG(FATAL) << "Unknown attribute type: " << attr.type;
-    }
+      case 1: {
+        std::shared_ptr<RuntimeAttribute> runtime_attribute =
+            std::make_shared<RuntimeAttribute>();
+        runtime_attribute->type = RuntimeDataType::kTypeFloat32;
+        runtime_attribute->weight_data = attr.data;
+        runtime_attribute->shape = attr.shape;
+        runtime_operator->attribute.insert({name, runtime_attribute});
+        break;
+      }
+      default: {
+        LOG(FATAL) << "Unknown attribute type: " << attr.type;
+      }
     }
   }
 }

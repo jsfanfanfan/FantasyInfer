@@ -1,85 +1,104 @@
 #ifndef FANTASY_INFER_INCLUDE_PARSER_RUNTIME_PARAMETER_HPP_
 #define FANTASY_INFER_INCLUDE_PARSER_RUNTIME_PARAMETER_HPP_
-#include "status_code.hpp"
 #include <string>
 #include <vector>
+#include "status_code.hpp"
 
-namespace fantasy_infer
-{
-    /**
-     * 计算节点中的参数信息，参数一共可以分为如下的几类
-     * 1.int
-     * 2.float
-     * 3.string
-     * 4.bool
-     * 5.int array
-     * 6.string array
-     * 7.float array
-     */
-    struct RuntimeParameter
-    { /// 计算节点中的参数信息
-        virtual ~RuntimeParameter() = default;
+namespace fantasy_infer {
+/**
+ * 计算节点中的参数信息，参数一共可以分为如下的几类
+ * 1.int
+ * 2.float
+ * 3.string
+ * 4.bool
+ * 5.int array
+ * 6.string array
+ * 7.float array
+ */
+struct RuntimeParameter {  /// 计算节点中的参数信息
+  virtual ~RuntimeParameter() = default;
 
-        explicit RuntimeParameter(RuntimeParameterType type = RuntimeParameterType::kParameterUnknown) : type(type)
-        {
-        }
-        RuntimeParameterType type = RuntimeParameterType::kParameterUnknown;
-    };
+  explicit RuntimeParameter(
+      RuntimeParameterType type = RuntimeParameterType::kParameterUnknown)
+      : type(type) {}
+  RuntimeParameterType type = RuntimeParameterType::kParameterUnknown;
+};
 
-    struct RuntimeParameterInt : public RuntimeParameter
-    {
-        RuntimeParameterInt() : RuntimeParameter(RuntimeParameterType::kParameterInt)
-        {
-        }
-        int value = 0;
-    };
+struct RuntimeParameterInt : public RuntimeParameter {
+  RuntimeParameterInt()
+      : RuntimeParameter(RuntimeParameterType::kParameterInt) {}
 
-    struct RuntimeParameterFloat : public RuntimeParameter
-    {
-        RuntimeParameterFloat() : RuntimeParameter(RuntimeParameterType::kParameterFloat)
-        {
-        }
-        float value = 0.f;
-    };
+  explicit RuntimeParameterInt(int param_value)
+      : RuntimeParameter(RuntimeParameterType::kParameterInt),
+        value(param_value) {}
 
-    struct RuntimeParameterString : public RuntimeParameter
-    {
-        RuntimeParameterString() : RuntimeParameter(RuntimeParameterType::kParameterString)
-        {
-        }
-        std::string value;
-    };
+  int value = 0;
+};
 
-    struct RuntimeParameterIntArray : public RuntimeParameter
-    {
-        RuntimeParameterIntArray() : RuntimeParameter(RuntimeParameterType::kParameterIntArray)
-        {
-        }
-        std::vector<int> value;
-    };
+struct RuntimeParameterFloat : public RuntimeParameter {
+  RuntimeParameterFloat()
+      : RuntimeParameter(RuntimeParameterType::kParameterFloat) {}
 
-    struct RuntimeParameterFloatArray : public RuntimeParameter
-    {
-        RuntimeParameterFloatArray() : RuntimeParameter(RuntimeParameterType::kParameterFloatArray)
-        {
-        }
-        std::vector<float> value;
-    };
+  explicit RuntimeParameterFloat(float param_value)
+      : RuntimeParameter(RuntimeParameterType::kParameterFloat),
+        value(param_value) {}
 
-    struct RuntimeParameterStringArray : public RuntimeParameter
-    {
-        RuntimeParameterStringArray() : RuntimeParameter(RuntimeParameterType::kParameterStringArray)
-        {
-        }
-        std::vector<std::string> value;
-    };
+  float value = 0.f;
+};
 
-    struct RuntimeParameterBool : public RuntimeParameter
-    {
-        RuntimeParameterBool() : RuntimeParameter(RuntimeParameterType::kParameterBool)
-        {
-        }
-        bool value = false;
-    };
-}
-#endif // FANTASY_INFER_INCLUDE_PARSER_RUNTIME_PARAMETER_HPP_
+struct RuntimeParameterString : public RuntimeParameter {
+  RuntimeParameterString()
+      : RuntimeParameter(RuntimeParameterType::kParameterString) {}
+
+  explicit RuntimeParameterString(std::string param_value)
+      : RuntimeParameter(RuntimeParameterType::kParameterString),
+        value(std::move(param_value)) {}
+
+  std::string value;
+};
+
+struct RuntimeParameterIntArray : public RuntimeParameter {
+  RuntimeParameterIntArray()
+      : RuntimeParameter(RuntimeParameterType::kParameterIntArray) {}
+
+  explicit RuntimeParameterIntArray(std::vector<int> param_value)
+      : RuntimeParameter(RuntimeParameterType::kParameterIntArray),
+        value(std::move(param_value)) {}
+
+  std::vector<int> value;
+};
+
+struct RuntimeParameterFloatArray : public RuntimeParameter {
+  RuntimeParameterFloatArray()
+      : RuntimeParameter(RuntimeParameterType::kParameterFloatArray) {}
+
+  explicit RuntimeParameterFloatArray(std::vector<float> param_value)
+      : RuntimeParameter(RuntimeParameterType::kParameterFloatArray),
+        value(std::move(param_value)) {}
+
+  std::vector<float> value;
+};
+
+struct RuntimeParameterStringArray : public RuntimeParameter {
+  RuntimeParameterStringArray()
+      : RuntimeParameter(RuntimeParameterType::kParameterStringArray) {}
+
+  explicit RuntimeParameterStringArray(std::vector<std::string> param_value)
+      : RuntimeParameter(RuntimeParameterType::kParameterStringArray),
+        value(std::move(param_value)) {}
+
+  std::vector<std::string> value;
+};
+
+struct RuntimeParameterBool : public RuntimeParameter {
+  RuntimeParameterBool()
+      : RuntimeParameter(RuntimeParameterType::kParameterBool) {}
+
+  explicit RuntimeParameterBool(bool param_value)
+      : RuntimeParameter(RuntimeParameterType::kParameterBool),
+        value(param_value) {}
+
+  bool value = false;
+};
+}  // namespace fantasy_infer
+#endif  // FANTASY_INFER_INCLUDE_PARSER_RUNTIME_PARAMETER_HPP_

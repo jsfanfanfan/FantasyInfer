@@ -2,14 +2,14 @@
 #include "data/tensor_utils.hpp"
 
 namespace fantasy_infer {
-RuntimeOperator::~RuntimeOperator() {
-  for (auto &[_, param] : this->params) {
-    if (param != nullptr) {
-      delete param;
-      param = nullptr;
-    }
-  }
-}
+// RuntimeOperator::~RuntimeOperator() {
+//   for (auto &[_, param] : this->params) {
+//     if (param != nullptr) {
+//       delete param;
+//       param = nullptr;
+//     }
+//   }
+// }
 
 void RuntimeOperatorUtils::InitOperatorInput(
     const std::vector<std::shared_ptr<RuntimeOperator>> &operators) {
