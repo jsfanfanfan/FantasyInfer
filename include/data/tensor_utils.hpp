@@ -36,6 +36,14 @@ bool TensorIsSame(const std::shared_ptr<Tensor<float>>& a,
                   float threshold = 1e-5f);
 
 /**
+ * 张量 sin
+ * @param tensor 输入张量
+ * @return 张量 sin 的结果
+ */
+std::shared_ptr<Tensor<float>> TensorElementSin(
+    const std::shared_ptr<Tensor<float>>& tensor);
+
+/**
  * 张量相加
  * @param tensor1 输入张量1
  * @param tensor2 输入张量2

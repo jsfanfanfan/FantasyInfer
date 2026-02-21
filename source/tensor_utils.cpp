@@ -53,6 +53,14 @@ void TensorElementMultiply(
   }
 }
 
+std::shared_ptr<Tensor<float>> TensorElementSin(
+    const std::shared_ptr<Tensor<float>>& tensor) {
+  CHECK(tensor != nullptr);
+  sftensor output_tensor = TensorCreate(tensor->shapes());
+  output_tensor->set_data(arma::sin(tensor->data()));
+  return output_tensor;
+}
+
 std::shared_ptr<Tensor<float>> TensorElementAdd(
     const std::shared_ptr<Tensor<float>>& tensor1,
     const std::shared_ptr<Tensor<float>>& tensor2) {
