@@ -1,6 +1,3 @@
-//
-// Created by fss on 23-6-4.
-//
 #include "data/tensor.hpp"
 #include "runtime/ir.h"
 #include "runtime/runtime_ir.hpp"

@@ -1,6 +1,3 @@
-//
-// Created by fss on 23-6-4.
-//
 #include "data/tensor.hpp"
 #include <glog/logging.h>
 #include <gtest/gtest.h>
