@@ -54,8 +54,10 @@ void YoloDemo(const std::vector<std::string> &image_paths,
   const int32_t input_h = 640;
   const int32_t input_w = 640;
 
+  LOG(INFO) << "Loading YOLO graph: " << param_path << ", " << bin_path;
   RuntimeGraph graph(param_path, bin_path);
   graph.Build("pnnx_input_0", "pnnx_output_0");
+  LOG(INFO) << "Graph build done.";
 
   assert(batch_size == image_paths.size());
   std::vector<sftensor> inputs;
@@ -72,6 +74,7 @@ void YoloDemo(const std::vector<std::string> &image_paths,
   outputs = graph.Forward(inputs, true);
   assert(outputs.size() == inputs.size());
   assert(outputs.size() == batch_size);
+  LOG(INFO) << "Forward done, output batch size: " << outputs.size();
 
   for (int i = 0; i < outputs.size(); ++i) {
     const auto &image = cv::imread(image_paths.at(i));
@@ -134,13 +137,16 @@ void YoloDemo(const std::vector<std::string> &image_paths,
     int font_face = cv::FONT_HERSHEY_COMPLEX;
     double font_scale = 2;
 
+    LOG(INFO) << "Image " << i << ": " << detections.size() << " detections.";
     for (const auto &detection : detections) {
       cv::rectangle(image, detection.box, cv::Scalar(255, 255, 255), 4);
       cv::putText(image, std::to_string(detection.class_id),
                   cv::Point(detection.box.x, detection.box.y), font_face,
                   font_scale, cv::Scalar(255, 255, 0), 4);
     }
-    cv::imwrite(std::string("output") + std::to_string(i) + ".jpg", image);
+    std::string out_path = std::string("output") + std::to_string(i) + ".jpg";
+    cv::imwrite(out_path, image);
+    LOG(INFO) << "Saved result to " << out_path;
   }
 }
 

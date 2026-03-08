@@ -50,7 +50,7 @@ fantasy_infer::sftensor PreProcessImage(const cv::Mat &image) {
 }
 
 // /home/fjs/FantasyInfer/model_file/resnet18_batch1.param
-TEST(test_network, resnet1) {
+TEST(test_network, resnet) {
   using namespace fantasy_infer;
   const std::string &param_path = "/home/fjs/FantasyInfer/model_file/resnet18_batch1.pnnx.param";
   const std::string &weight_path = "/home/fjs/FantasyInfer/model_file/resnet18_batch1.pnnx.bin";

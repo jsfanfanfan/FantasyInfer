@@ -44,16 +44,16 @@ struct RuntimeOperator {
 class RuntimeOperatorUtils {
 public:
   /**
-   * 如果图是第一次运行，则根据节点输入operand的形状准备好后续Layer计算中所需要的Tensor
-   * 如果图是第二次以上运行，则检查输入operand的形状和operand中张量的形状是否匹配
+   * 如果图是第一次运行，则根据节点输入 operand 的形状准备好后续 Layer 计算中所需要的 Tensor
+   * 如果图是第二次以上运行，则检查输入 operand 的形状和 operand 中张量的形状是否匹配
    * @param operators 计算图中的计算节点
    */
   static void InitOperatorInput(
       const std::vector<std::shared_ptr<RuntimeOperator>>& operators);
 
   /**
-   * 如果图是第一次运行，则根据节点输出operand的形状准备好后续Layer计算中所需要的Tensor
-   * 如果图是第二次以上运行，则检查输出operand的形状和operand中张量的形状是否匹配
+   * 如果图是第一次运行，则根据节点输出 operand 的形状准备好后续 Layer 计算中所需要的 Tensor
+   * 如果图是第二次以上运行，则检查输出 operand 的形状和 operand 中张量的形状是否匹配
    * @param pnnx_operators pnnx图节点
    * @param operators fantasyInfer计算图中的计算节点
    */
